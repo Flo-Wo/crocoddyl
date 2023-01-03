@@ -118,6 +118,7 @@ struct ActivationDataLogBarrierTpl : public ActivationDataAbstractTpl<_Scalar> {
   explicit ActivationDataLogBarrierTpl(Activation* const activation)
       : Base(activation), a(0) {}
 
+  // param to save intermediate result and transfer it from calc to calcDiff
   Scalar a;
   using Base::Arr;
 };
