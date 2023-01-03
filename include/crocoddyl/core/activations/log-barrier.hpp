@@ -12,7 +12,7 @@
 namespace crocoddyl {
 
 /**
- * @brief Smooth-abs activation
+ * @brief Logarithmic Barrier function
  *
  * The computation of the function and it derivatives are carried out in
  * `calc()` and `caldDiff()`, respectively.
@@ -29,7 +29,7 @@ class ActivationModelLogBarrierTpl
   typedef MathBaseTpl<Scalar> MathBase;
   typedef ActivationModelAbstractTpl<Scalar> Base;
   typedef ActivationDataAbstractTpl<Scalar> ActivationDataAbstract;
-  typedef ActivationDataLogBarrier<Scalar> Data;
+  typedef ActivationDataLogBarrierTpl<Scalar> Data;
   typedef typename MathBase::VectorXs VectorXs;
   typedef typename MathBase::MatrixXs MatrixXs;
 
@@ -111,8 +111,8 @@ struct ActivationDataLogBarrierTpl : public ActivationDataAbstractTpl<_Scalar> {
 
   typedef _Scalar Scalar;
   typedef ActivationDataAbstractTpl<Scalar> Base;
-  typedef MathBaseTpl<Scalar> MathBase;
-  typedef typename MathBase::MatrixXs MatrixXs;
+  // typedef MathBaseTpl<Scalar> MathBase;
+  // typedef typename MathBase::MatrixXs MatrixXs;
 
   template <typename Activation>
   explicit ActivationDataLogBarrierTpl(Activation* const activation)

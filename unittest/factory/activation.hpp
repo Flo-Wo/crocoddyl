@@ -26,6 +26,7 @@ struct ActivationModelTypes {
     ActivationModelQuadraticBarrier,
     ActivationModelWeightedQuadraticBarrier,
     ActivationModel2NormBarrier,
+    ActivationModelLogBarrier,
     NbActivationModelTypes
   };
   static std::vector<Type> init_all() {
@@ -48,8 +49,8 @@ class ActivationModelFactory {
   explicit ActivationModelFactory();
   ~ActivationModelFactory();
 
-  boost::shared_ptr<crocoddyl::ActivationModelAbstract> create(ActivationModelTypes::Type activation_type,
-                                                               std::size_t nr = 5) const;
+  boost::shared_ptr<crocoddyl::ActivationModelAbstract> create(
+      ActivationModelTypes::Type activation_type, std::size_t nr = 5) const;
 };
 
 }  // namespace unittest
