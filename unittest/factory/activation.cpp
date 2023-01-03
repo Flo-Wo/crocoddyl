@@ -126,7 +126,7 @@ ActivationModelFactory::create(ActivationModelTypes::Type activation_type,
           nr, alpha, hessian);
       break;
     case ActivationModelTypes::ActivationModelLogBarrier:
-      std::cout << "activation.cpp: My model\n";
+      std::cout << "activation.cpp: ModelLogBarrier\n";
       activation =
           boost::make_shared<crocoddyl::ActivationModelLogBarrier>(nr, bound);
       break;
