@@ -313,6 +313,10 @@ typedef ActivationModelSmooth1NormTpl<double> ActivationModelSmooth1Norm;
 typedef ActivationDataSmooth1NormTpl<double> ActivationDataSmooth1Norm;
 typedef ActivationModelSmooth2NormTpl<double> ActivationModelSmooth2Norm;
 typedef ActivationDataSmooth2NormTpl<double> ActivationDataSmooth2Norm;
+
+typedef ActivationModelLogBarrierTpl<double> ActivationModelLogBarrier;
+typedef ActivationDataLogBarrierTpl<double> ActivationDataLogBarrier;
+
 typedef ActivationModel2NormBarrierTpl<double> ActivationModel2NormBarrier;
 typedef ActivationData2NormBarrierTpl<double> ActivationData2NormBarrier;
 typedef ActivationModelAbstractTpl<double> ActivationModelAbstract;
