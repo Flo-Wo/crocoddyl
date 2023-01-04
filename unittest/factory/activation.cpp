@@ -127,8 +127,8 @@ ActivationModelFactory::create(ActivationModelTypes::Type activation_type,
       break;
     case ActivationModelTypes::ActivationModelLogBarrier:
       std::cout << "activation.cpp: ModelLogBarrier\n";
-      activation =
-          boost::make_shared<crocoddyl::ActivationModelLogBarrier>(nr, bound);
+      activation = boost::make_shared<crocoddyl::ActivationModelLogBarrier>(
+          weights, bound);
       break;
     default:
       throw_pretty(__FILE__ ":\n Construct wrong ActivationModelTypes::Type");

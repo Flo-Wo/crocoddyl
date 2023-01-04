@@ -33,9 +33,12 @@ class ActivationModelLogBarrierTpl
   typedef typename MathBase::VectorXs VectorXs;
   typedef typename MathBase::MatrixXs MatrixXs;
 
-  explicit ActivationModelLogBarrierTpl(const std::size_t nr,
+  explicit ActivationModelLogBarrierTpl(const VectorXs& weights,
                                         const Scalar bound = Scalar(1.))
-      : Base(nr), bound_(bound){};
+      : Base(weights.size()),
+        weights_(weights),
+        bound_(bound),
+        new_weights_(false){};
   virtual ~ActivationModelLogBarrierTpl(){};
 
   // define the computational methods
@@ -48,10 +51,12 @@ class ActivationModelLogBarrierTpl
     }
     boost::shared_ptr<Data> d = boost::static_pointer_cast<Data>(data);
 
-    // TODO: maybe save the inner value to avoid a recomputation in calcDiff
-    d->a = bound_ - r.squaredNorm();
-    data->a_value = -Scalar(0.5) * log(d->a);
-    // data->a_value = -Scalar(0.5) * log(bound_ - r.squaredNorm());
+    // compute the difference between the bound and the values (componentwise)
+    // save result as we also need it for the gradient
+    d->DiffInv = (bound_ - r.array()).matrix().inverse();
+
+    data->a_value =
+        Scalar(-1) * weights_.dot((bound_ - r.array()).log().matrix());
   };
 
   /**
@@ -69,16 +74,13 @@ class ActivationModelLogBarrierTpl
     }
 
     boost::shared_ptr<Data> d = boost::static_pointer_cast<Data>(data);
-    // computation of the gradient
-    data->Ar = -r / (d->a);
 
-    // computation of the hessian
-    data->Arr = 1 / ((d->a) * (d->a)) * r * r.transpose();
-    data->Arr.diagonal() += -1 / (d->a);
+    // computation of the gradient, given by w/(b-x) componentwise
+    data->Ar = weights_.cwiseProduct(d->DiffInv);
 
-    // data->Ar = r.cwiseProduct(d->a.cwiseInverse());
-    // data->Arr.diagonal() =
-    //     d->a.cwiseProduct(d->a).cwiseProduct(d->a).cwiseInverse();
+    // computation of the hessian, given by diag(w \odot 1/(b-x)^2 )
+    data->Arr.diagonal() =
+        (data->Ar).cwiseProduct((d->DiffInv).array().pow(2).matrix());
   };
 
   /**
@@ -90,6 +92,17 @@ class ActivationModelLogBarrierTpl
     return boost::allocate_shared<Data>(Eigen::aligned_allocator<Data>(), this);
   };
 
+  const VectorXs& get_weights() const { return weights_; };
+  void set_weights(const VectorXs& weights) {
+    if (weights.size() != weights_.size()) {
+      throw_pretty("Invalid argument: "
+                   << "weight vector has wrong dimension (it should be " +
+                          std::to_string(weights_.size()) + ")");
+    }
+
+    weights_ = weights;
+    new_weights_ = true;
+  };
   /**
    * @brief Print relevant information of the smooth-1norm model
    *
@@ -103,6 +116,9 @@ class ActivationModelLogBarrierTpl
  protected:
   using Base::nr_;  //!< Dimension of the residual vector
   Scalar bound_;    //!< Smoothing factor
+ private:
+  VectorXs weights_;
+  bool new_weights_;
 };
 
 template <typename _Scalar>
@@ -111,15 +127,15 @@ struct ActivationDataLogBarrierTpl : public ActivationDataAbstractTpl<_Scalar> {
 
   typedef _Scalar Scalar;
   typedef ActivationDataAbstractTpl<Scalar> Base;
-  // typedef MathBaseTpl<Scalar> MathBase;
-  // typedef typename MathBase::MatrixXs MatrixXs;
+  typedef MathBaseTpl<Scalar> MathBase;
+  typedef typename MathBase::VectorXs VectorXs;
 
   template <typename Activation>
   explicit ActivationDataLogBarrierTpl(Activation* const activation)
-      : Base(activation), a(0) {}
+      : Base(activation), DiffInv(VectorXs::Zero(activation->get_nr())) {}
 
   // param to save intermediate result and transfer it from calc to calcDiff
-  Scalar a;
+  VectorXs DiffInv;
   using Base::Arr;
 };
 
