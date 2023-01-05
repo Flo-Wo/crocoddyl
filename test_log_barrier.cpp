@@ -2,6 +2,7 @@
 
 #include "crocoddyl/core/activations/log-barrier.hpp"
 
+// g++ test_log_barrier.cpp -I/opt/homebrew/include -I/./include
 void test_computation() {
   std::size_t nr = 1;
   Eigen::VectorXd weights_log_barrier = 1. * Eigen::VectorXd::Ones(nr);
