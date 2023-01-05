@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // BSD 3-Clause License
 //
-// Copyright (C) 2019-2021, University of Edinburgh, LAAS-CNRS, University of Trento
-// Copyright note valid unless otherwise stated in individual files.
-// All rights reserved.
+// Copyright (C) 2019-2021, University of Edinburgh, LAAS-CNRS, University of
+// Trento Copyright note valid unless otherwise stated in individual files. All
+// rights reserved.
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "python/crocoddyl/core/core.hpp"
@@ -55,6 +55,7 @@ void exposeCore() {
   exposeActivationSmooth1Norm();
   exposeActivationSmooth2Norm();
   exposeActivation2NormBarrier();
+  exposeActivationLogBarrier();
   exposeSolverKKT();
   exposeSolverDDP();
   exposeSolverFDDP();

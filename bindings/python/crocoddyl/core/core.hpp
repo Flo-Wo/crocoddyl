@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // BSD 3-Clause License
 //
-// Copyright (C) 2019-2021, LAAS-CNRS, University of Edinburgh, University of Trento
-// Copyright note valid unless otherwise stated in individual files.
-// All rights reserved.
+// Copyright (C) 2019-2021, LAAS-CNRS, University of Edinburgh, University of
+// Trento Copyright note valid unless otherwise stated in individual files. All
+// rights reserved.
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef BINDINGS_PYTHON_CROCODDYL_CORE_CORE_HPP_
@@ -57,6 +57,7 @@ void exposeActivationWeightedQuadraticBarrier();
 void exposeActivationSmooth1Norm();
 void exposeActivationSmooth2Norm();
 void exposeActivation2NormBarrier();
+void exposeActivationLogBarrier();
 void exposeSolverDDP();
 void exposeSolverKKT();
 void exposeSolverFDDP();
