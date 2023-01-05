@@ -35,10 +35,7 @@ class ActivationModelLogBarrierTpl
 
   explicit ActivationModelLogBarrierTpl(const VectorXs& weights,
                                         const Scalar bound = Scalar(1.))
-      : Base(weights.size()),
-        weights_(weights),
-        bound_(bound),
-        new_weights_(false){};
+      : Base(weights.size()), weights_(weights), bound_(bound){};
   virtual ~ActivationModelLogBarrierTpl(){};
 
   // define the computational methods
@@ -53,10 +50,12 @@ class ActivationModelLogBarrierTpl
 
     // compute the difference between the bound and the values (componentwise)
     // save result as we also need it for the gradient
-    d->DiffInv = (bound_ - r.array()).matrix().inverse();
+    d->DiffInv = (bound_ - weights_.cwiseProduct(r).array()).matrix().inverse();
 
     data->a_value =
-        Scalar(-1) * weights_.dot((bound_ - r.array()).log().matrix());
+        Scalar(-1) * (bound_ - weights_.cwiseProduct(r).array()).sum();
+    // data->a_value =
+    //     Scalar(-1) * weights_.dot((bound_ - r.array()).log().matrix());
   };
 
   /**
@@ -75,12 +74,12 @@ class ActivationModelLogBarrierTpl
 
     boost::shared_ptr<Data> d = boost::static_pointer_cast<Data>(data);
 
-    // computation of the gradient, given by w/(b-x) componentwise
+    // computation of the gradient, given by w/(b-w * x) componentwise
     data->Ar = weights_.cwiseProduct(d->DiffInv);
 
-    // computation of the hessian, given by diag(w \odot 1/(b-x)^2 )
-    data->Arr.diagonal() =
-        (data->Ar).cwiseProduct((d->DiffInv).array().pow(2).matrix());
+    // computation of the hessian, given by diag(w^2 \odot 1/(b-w*x)^2 )
+    // the diagonal is just the pointwise squared gradient
+    data->Arr.diagonal() = (data->Ar).array().pow(2).matrix();
   };
 
   /**
@@ -101,7 +100,6 @@ class ActivationModelLogBarrierTpl
     }
 
     weights_ = weights;
-    new_weights_ = true;
   };
   /**
    * @brief Print relevant information of the smooth-1norm model
@@ -118,7 +116,6 @@ class ActivationModelLogBarrierTpl
   Scalar bound_;    //!< Smoothing factor
  private:
   VectorXs weights_;
-  bool new_weights_;
 };
 
 template <typename _Scalar>
