@@ -34,7 +34,7 @@ class ActivationModelLogBarrierTpl
   typedef typename MathBase::MatrixXs MatrixXs;
 
   explicit ActivationModelLogBarrierTpl(const VectorXs& weights,
-                                        const Scalar bound = Scalar(1.))
+                                        const VectorXs& bound)
       : Base(weights.size()), weights_(weights), bound_(bound){};
   virtual ~ActivationModelLogBarrierTpl(){};
 
@@ -49,7 +49,7 @@ class ActivationModelLogBarrierTpl
     boost::shared_ptr<Data> d = boost::static_pointer_cast<Data>(data);
 
     data->a_value =
-        Scalar(-1) * (bound_ - weights_.cwiseProduct(r).array()).log().sum();
+        Scalar(-1) * (bound_ - weights_.cwiseProduct(r)).array().log().sum();
   };
 
   /**
@@ -70,7 +70,7 @@ class ActivationModelLogBarrierTpl
 
     // computation of the gradient, given by w/(b-w * x) componentwise
     data->Ar = weights_.cwiseProduct(
-        (bound_ - weights_.cwiseProduct(r).array()).inverse().matrix());
+        (bound_ - weights_.cwiseProduct(r)).array().inverse().matrix());
 
     // computation of the hessian, given by diag(w^2 \odot 1/(b-w*x)^2 )
     // the diagonal is just the pointwise squared gradient
@@ -108,7 +108,7 @@ class ActivationModelLogBarrierTpl
 
  protected:
   using Base::nr_;  //!< Dimension of the residual vector
-  Scalar bound_;    //!< Smoothing factor
+  VectorXs bound_;  //!< Componentwise upper bound
  private:
   VectorXs weights_;
 };
@@ -124,7 +124,7 @@ struct ActivationDataLogBarrierTpl : public ActivationDataAbstractTpl<_Scalar> {
 
   template <typename Activation>
   explicit ActivationDataLogBarrierTpl(Activation* const activation)
-      : Base(activation), DiffInv(VectorXs::Zero(activation->get_nr())) {}
+      : Base(activation) {}
 
   using Base::Arr;
 };

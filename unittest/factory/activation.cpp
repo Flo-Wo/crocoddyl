@@ -83,9 +83,9 @@ ActivationModelFactory::create(ActivationModelTypes::Type activation_type,
       lb + Eigen::VectorXd::Ones(nr) + Eigen::VectorXd::Random(nr);
   Eigen::VectorXd weights = 1. * Eigen::VectorXd::Random(nr);
   Eigen::VectorXd weights_log_barrier = 1. * Eigen::VectorXd::Ones(nr);
+  Eigen::VectorXd bound_log_barrier = 4. * Eigen::VectorXd::Ones(nr);
   double alpha = fabs(Eigen::VectorXd::Random(1)[0]);
   double eps = fabs(Eigen::VectorXd::Random(1)[0]);
-  double bound = 4.0;
   bool hessian = random_boolean();
 
   switch (activation_type) {
@@ -129,7 +129,7 @@ ActivationModelFactory::create(ActivationModelTypes::Type activation_type,
     case ActivationModelTypes::ActivationModelLogBarrier:
       std::cout << "activation.cpp: ModelLogBarrier\n" << std::endl;
       activation = boost::make_shared<crocoddyl::ActivationModelLogBarrier>(
-          weights_log_barrier, bound);
+          weights_log_barrier, bound_log_barrier);
       break;
     default:
       throw_pretty(__FILE__ ":\n Construct wrong ActivationModelTypes::Type");
