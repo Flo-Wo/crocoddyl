@@ -34,8 +34,12 @@ class ActivationModelLogBarrierTpl
   typedef typename MathBase::MatrixXs MatrixXs;
 
   explicit ActivationModelLogBarrierTpl(const VectorXs& weights,
-                                        const VectorXs& bound)
-      : Base(weights.size()), weights_(weights), bound_(bound){};
+                                        const VectorXs& bound,
+                                        const Scalar damping = Scalar(1.0))
+      : Base(weights.size()),
+        weights_(weights),
+        bound_(bound),
+        damping_(damping){};
   virtual ~ActivationModelLogBarrierTpl(){};
 
   // define the computational methods
@@ -48,8 +52,8 @@ class ActivationModelLogBarrierTpl
     // }
     boost::shared_ptr<Data> d = boost::static_pointer_cast<Data>(data);
 
-    data->a_value =
-        Scalar(-1) * (bound_ - weights_.cwiseProduct(r)).array().log().sum();
+    data->a_value = Scalar(-1) * damping_ *
+                    (bound_ - weights_.cwiseProduct(r)).array().log().sum();
   };
 
   /**
@@ -68,13 +72,17 @@ class ActivationModelLogBarrierTpl
 
     boost::shared_ptr<Data> d = boost::static_pointer_cast<Data>(data);
 
-    // computation of the gradient, given by w/(b-w * x) componentwise
-    data->Ar = weights_.cwiseProduct(
+    // computation of the gradient without the damping coefficient, given by
+    // w/(b-w * x) componentwise -> save as intermediate result
+    d->GradWithoutDamping = weights_.cwiseProduct(
         (bound_ - weights_.cwiseProduct(r)).array().inverse().matrix());
+
+    data->Ar = damping_ * (d->GradWithoutDamping);
 
     // computation of the hessian, given by diag(w^2 \odot 1/(b-w*x)^2 )
     // the diagonal is just the pointwise squared gradient
-    data->Arr.diagonal() = (data->Ar).array().pow(2).matrix();
+    data->Arr.diagonal() =
+        damping_ * (d->GradWithoutDamping).array().pow(2).matrix();
   };
 
   /**
@@ -108,9 +116,10 @@ class ActivationModelLogBarrierTpl
 
  protected:
   using Base::nr_;  //!< Dimension of the residual vector
-  VectorXs bound_;  //!< Componentwise upper bound
  private:
-  VectorXs weights_;
+  VectorXs bound_;  //!< Componentwise upper bound
+  Scalar damping_;  // factor of 1/damping in front of the log-barrier function
+  VectorXs weights_;  // componentwise weights
 };
 
 template <typename _Scalar>
@@ -124,8 +133,10 @@ struct ActivationDataLogBarrierTpl : public ActivationDataAbstractTpl<_Scalar> {
 
   template <typename Activation>
   explicit ActivationDataLogBarrierTpl(Activation* const activation)
-      : Base(activation) {}
+      : Base(activation),
+        GradWithoutDamping(VectorXs::Zero(activation->get_nr())) {}
 
+  VectorXs GradWithoutDamping;  //!< Componentwise upper bound
   using Base::Arr;
 };
 
