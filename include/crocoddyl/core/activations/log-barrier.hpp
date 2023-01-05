@@ -117,9 +117,9 @@ class ActivationModelLogBarrierTpl
  protected:
   using Base::nr_;  //!< Dimension of the residual vector
  private:
-  VectorXs bound_;  //!< Componentwise upper bound
-  Scalar damping_;  // factor of 1/damping in front of the log-barrier function
   VectorXs weights_;  // componentwise weights
+  VectorXs bound_;    //!< Componentwise upper bound
+  Scalar damping_;  // factor of 1/damping in front of the log-barrier function
 };
 
 template <typename _Scalar>
