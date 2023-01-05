@@ -59,9 +59,9 @@ std::ostream& operator<<(std::ostream& os, ActivationModelTypes::Type type) {
     case ActivationModelTypes::ActivationModel2NormBarrier:
       os << "ActivationModel2NormBarrier";
       break;
-    // case ActivationModelTypes::ActivationModelLogBarrier:
-    //   os << "ActivationModelLogBarrier";
-    //   break;
+    case ActivationModelTypes::ActivationModelLogBarrier:
+      os << "ActivationModelLogBarrier";
+      break;
     case ActivationModelTypes::NbActivationModelTypes:
       os << "NbActivationModelTypes";
       break;
@@ -82,7 +82,7 @@ ActivationModelFactory::create(ActivationModelTypes::Type activation_type,
   Eigen::VectorXd ub =
       lb + Eigen::VectorXd::Ones(nr) + Eigen::VectorXd::Random(nr);
   Eigen::VectorXd weights = 1. * Eigen::VectorXd::Random(nr);
-  Eigen::VectorXd weights_log_barrier = 1. * Eigen::VectorXd::Zero(nr);
+  Eigen::VectorXd weights_log_barrier = 1. * Eigen::VectorXd::Ones(nr);
   double alpha = fabs(Eigen::VectorXd::Random(1)[0]);
   double eps = fabs(Eigen::VectorXd::Random(1)[0]);
   double bound = 4.0;
@@ -126,11 +126,11 @@ ActivationModelFactory::create(ActivationModelTypes::Type activation_type,
       activation = boost::make_shared<crocoddyl::ActivationModel2NormBarrier>(
           nr, alpha, hessian);
       break;
-    // case ActivationModelTypes::ActivationModelLogBarrier:
-    //   std::cout << "activation.cpp: ModelLogBarrier\n" << std::endl;
-    //   activation = boost::make_shared<crocoddyl::ActivationModelLogBarrier>(
-    //       weights_log_barrier, bound);
-    //   break;
+    case ActivationModelTypes::ActivationModelLogBarrier:
+      std::cout << "activation.cpp: ModelLogBarrier\n" << std::endl;
+      activation = boost::make_shared<crocoddyl::ActivationModelLogBarrier>(
+          weights_log_barrier, bound);
+      break;
     default:
       throw_pretty(__FILE__ ":\n Construct wrong ActivationModelTypes::Type");
       break;

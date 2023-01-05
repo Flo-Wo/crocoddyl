@@ -26,7 +26,7 @@ struct ActivationModelTypes {
     ActivationModelQuadraticBarrier,
     ActivationModelWeightedQuadraticBarrier,
     ActivationModel2NormBarrier,
-    // ActivationModelLogBarrier,
+    ActivationModelLogBarrier,
     NbActivationModelTypes
   };
   static std::vector<Type> init_all() {

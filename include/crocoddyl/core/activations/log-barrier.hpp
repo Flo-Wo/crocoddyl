@@ -48,14 +48,8 @@ class ActivationModelLogBarrierTpl
     // }
     boost::shared_ptr<Data> d = boost::static_pointer_cast<Data>(data);
 
-    // compute the difference between the bound and the values (componentwise)
-    // save result as we also need it for the gradient
-    d->DiffInv = (bound_ - weights_.cwiseProduct(r).array()).inverse().matrix();
-
     data->a_value =
         Scalar(-1) * (bound_ - weights_.cwiseProduct(r).array()).log().sum();
-    // data->a_value =
-    //     Scalar(-1) * weights_.dot((bound_ - r.array()).log().matrix());
   };
 
   /**
@@ -75,7 +69,8 @@ class ActivationModelLogBarrierTpl
     boost::shared_ptr<Data> d = boost::static_pointer_cast<Data>(data);
 
     // computation of the gradient, given by w/(b-w * x) componentwise
-    data->Ar = weights_.cwiseProduct(d->DiffInv);
+    data->Ar = weights_.cwiseProduct(
+        (bound_ - weights_.cwiseProduct(r).array()).inverse().matrix());
 
     // computation of the hessian, given by diag(w^2 \odot 1/(b-w*x)^2 )
     // the diagonal is just the pointwise squared gradient
@@ -131,8 +126,6 @@ struct ActivationDataLogBarrierTpl : public ActivationDataAbstractTpl<_Scalar> {
   explicit ActivationDataLogBarrierTpl(Activation* const activation)
       : Base(activation), DiffInv(VectorXs::Zero(activation->get_nr())) {}
 
-  // param to save intermediate result and transfer it from calc to calcDiff
-  VectorXs DiffInv;
   using Base::Arr;
 };
 
