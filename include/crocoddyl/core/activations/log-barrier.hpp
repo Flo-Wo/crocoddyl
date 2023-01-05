@@ -7,7 +7,7 @@
 
 #include "crocoddyl/core/activation-base.hpp"
 #include "crocoddyl/core/fwd.hpp"
-#include "crocoddyl/core/utils/exception.hpp"
+// #include "crocoddyl/core/utils/exception.hpp"
 
 namespace crocoddyl {
 
@@ -41,19 +41,19 @@ class ActivationModelLogBarrierTpl
   // define the computational methods
   virtual void calc(const boost::shared_ptr<ActivationDataAbstract>& data,
                     const Eigen::Ref<const VectorXs>& r) {
-    if (static_cast<std::size_t>(r.size()) != nr_) {
-      throw_pretty("Invalid argument: "
-                   << "r has wrong dimension (it should be " +
-                          std::to_string(nr_) + ")");
-    }
+    // if (static_cast<std::size_t>(r.size()) != nr_) {
+    //   throw_pretty("Invalid argument: "
+    //                << "r has wrong dimension (it should be " +
+    //                       std::to_string(nr_) + ")");
+    // }
     boost::shared_ptr<Data> d = boost::static_pointer_cast<Data>(data);
 
     // compute the difference between the bound and the values (componentwise)
     // save result as we also need it for the gradient
-    d->DiffInv = (bound_ - weights_.cwiseProduct(r).array()).matrix().inverse();
+    d->DiffInv = (bound_ - weights_.cwiseProduct(r).array()).inverse().matrix();
 
     data->a_value =
-        Scalar(-1) * (bound_ - weights_.cwiseProduct(r).array()).sum();
+        Scalar(-1) * (bound_ - weights_.cwiseProduct(r).array()).log().sum();
     // data->a_value =
     //     Scalar(-1) * weights_.dot((bound_ - r.array()).log().matrix());
   };
@@ -66,11 +66,11 @@ class ActivationModelLogBarrierTpl
    */
   virtual void calcDiff(const boost::shared_ptr<ActivationDataAbstract>& data,
                         const Eigen::Ref<const VectorXs>& r) {
-    if (static_cast<std::size_t>(r.size()) != nr_) {
-      throw_pretty("Invalid argument: "
-                   << "r has wrong dimension (it should be " +
-                          std::to_string(nr_) + ")");
-    }
+    // if (static_cast<std::size_t>(r.size()) != nr_) {
+    //   throw_pretty("Invalid argument: "
+    //                << "r has wrong dimension (it should be " +
+    //                       std::to_string(nr_) + ")");
+    // }
 
     boost::shared_ptr<Data> d = boost::static_pointer_cast<Data>(data);
 
@@ -93,11 +93,11 @@ class ActivationModelLogBarrierTpl
 
   const VectorXs& get_weights() const { return weights_; };
   void set_weights(const VectorXs& weights) {
-    if (weights.size() != weights_.size()) {
-      throw_pretty("Invalid argument: "
-                   << "weight vector has wrong dimension (it should be " +
-                          std::to_string(weights_.size()) + ")");
-    }
+    // if (weights.size() != weights_.size()) {
+    //   throw_pretty("Invalid argument: "
+    //                << "weight vector has wrong dimension (it should be " +
+    //                       std::to_string(weights_.size()) + ")");
+    // }
 
     weights_ = weights;
   };
