@@ -6,8 +6,8 @@ namespace crocoddyl {
 namespace python {
 
 void exposeActivationLogBarrier() {
-  boost::python::register_ptr_to_python<
-      boost::shared_ptr<ActivationModelLogBarrier> >();
+  // boost::python::register_ptr_to_python<
+  //     boost::shared_ptr<ActivationModelLogBarrier> >();
 
   bp::class_<ActivationModelLogBarrier, bp::bases<ActivationModelAbstract> >(
       "ActivationModelQuad",
