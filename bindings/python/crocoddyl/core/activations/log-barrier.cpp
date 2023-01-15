@@ -6,15 +6,11 @@ namespace crocoddyl {
 namespace python {
 
 void exposeActivationLogBarrier() {
-  // boost::python::register_ptr_to_python<
-  //     boost::shared_ptr<ActivationModelLogBarrier> >();
+  boost::python::register_ptr_to_python<
+      boost::shared_ptr<ActivationModelLogBarrier> >();
 
   bp::class_<ActivationModelLogBarrier, bp::bases<ActivationModelAbstract> >(
-      "ActivationModelQuad",
-      "Quadratic activation model.\n\n"
-      "A quadratic action describes a quadratic function that depends on the "
-      "residual, i.e.\n"
-      "0.5 *||r||^2.",
+      "ActivationModelLogBarrier", "Log Barrier function.\n\n",
       bp::init<Eigen::VectorXd, Eigen::VectorXd, bp::optional<double> >(
           bp::args("self", "weights", "bound", "damping"),
           "Initialize the activation model.\n\n"
@@ -25,14 +21,12 @@ void exposeActivationLogBarrier() {
           "large t)"))
       .def("calc", &ActivationModelLogBarrier::calc,
            bp::args("self", "data", "r"),
-           "Compute the 0.5 * ||r||^2.\n\n"
+           "Compute log barrier loss\n\n"
            ":param data: activation data\n"
            ":param r: residual vector")
       .def("calcDiff", &ActivationModelLogBarrier::calcDiff,
            bp::args("self", "data", "r"),
-           "Compute the derivatives of a quadratic function.\n\n"
-           "Note that the Hessian is constant, so we don't write again this "
-           "value.\n"
+           "Compute the derivatives of the log barrier function.\n\n"
            "It assumes that calc has been run first.\n"
            ":param data: activation data\n"
            ":param r: residual vector \n")
